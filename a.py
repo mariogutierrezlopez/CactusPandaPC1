@@ -1,60 +1,81 @@
-from PySide6.QtWidgets import QApplication, QTableWidget, QTableWidgetItem, QPushButton, QVBoxLayout, QWidget, QLabel
+import sys
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error, r2_score
 
-class VentanaInformacion(QWidget):
-    def __init__(self, informacion):
+# Crear un DataFrame de ejemplo
+data = {'SOFASCORE': [8.5, 9.0, 7.8, 6.5, 8.2],
+        'puntos_Jornada': [85, 90, 78, 65, 82]}
+df = pd.DataFrame(data)
+
+# Seleccionar los atributos con mayor correlación
+selected_features = ['SOFASCORE']
+X = df[selected_features]
+y = df['puntos_Jornada']
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+# Crear el modelo KNN para regresión
+knn_model = KNeighborsRegressor(n_neighbors=4)
+
+# Realizar Cross-Validation para evaluar el rendimiento del modelo
+scores = cross_val_score(knn_model, X_train, y_train, cv=4, scoring='neg_mean_squared_error')
+
+# Calcular el error cuadrático medio medio del modelo
+mse = -np.mean(scores)
+
+# Entrenar el modelo con los datos de entrenamiento
+knn_model.fit(X_train, y_train)
+
+# Realizar predicciones con los datos de prueba
+y_pred = knn_model.predict(X_test)
+
+# Calcular el coeficiente de determinación (R2)
+r2 = r2_score(y_test, y_pred)
+
+# Crear un cuadro de diálogo para mostrar el gráfico de dispersión
+class ScatterPlotDialog(QDialog):
+    def __init__(self, X_test, y_test, y_pred):
         super().__init__()
 
-    def mostrarInformacion(self):
-        print(f'Información adicional: {informacion}')
+        self.setWindowTitle('Gráfico de Dispersión con KNN de Predicción de Puntos Jornada')
 
-class TablaConBotones(QTableWidget):
-    def __init__(self):
-        super().__init__()
+        # Crear la figura y el área de dibujo de Matplotlib
+        self.fig, self.ax = plt.subplots()
 
-    def cargarDatos(self):
-        columnas = ['Futbolista', 'Precio hoy', 'Predicción precio', 'Puntos hoy', 'Predicción puntos', 'Acción']
-        informacion_extra = [
-            "Información adicional para el futbolista 1",
-            "Información adicional para el futbolista 2",
-            "Información adicional para el futbolista 3",
-            "Información adicional para el futbolista 4",
-            "Información adicional para el futbolista 5"
-        ]
+        # Dibujar el gráfico de dispersión
+        self.ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
+        self.ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
+        self.ax.plot(X_test['SOFASCORE'], knn_model.predict(X_test), color='red', linewidth=2, label='KNN')
 
-        # Establecer el número de columnas y sus etiquetas
-        self.setColumnCount(len(columnas))
-        self.setHorizontalHeaderLabels(columnas)
+        # Configurar la leyenda y etiquetas
+        self.ax.legend()
+        self.ax.set_xlabel('SOFASCORE')
+        self.ax.set_ylabel('puntos_Jornada')
 
-        # Ajustar el tamaño de las columnas
-        self.resizeColumnsToContents()
+        # Crear el lienzo para mostrar la figura de Matplotlib
+        self.canvas = FigureCanvas(self.fig)
 
-        # Establecer el número de filas
-        self.setRowCount(len(informacion_extra))
+        # Botón para cerrar el cuadro de diálogo
+        self.close_button = QPushButton('Cerrar', self)
+        self.close_button.clicked.connect(self.accept)
 
-        # Añadir celdas con los nombres de las columnas y botones de información
-        for row, info_extra in enumerate(informacion_extra):
-            for col, columna in enumerate(columnas):
-                if col == len(columnas) - 1:
-                    # Añadir un botón 'Más Información' en la última columna
-                    boton = QPushButton('Más Información')
-                    self.setCellWidget(row, col, boton)
-                    boton.clicked.connect(self.mostrarInformacion)
-                else:
-                    # Añadir el contenido de la celda
-                    item = QTableWidgetItem(f'{columna} {row}')
-                    self.setItem(row, col, item)
+        # Diseño de la interfaz
+        layout = QVBoxLayout()
+        layout.addWidget(self.canvas)
+        layout.addWidget(self.close_button)
+        self.setLayout(layout)
 
-        # Ajustar el tamaño de la fila según su contenido
-        for row in range(self.rowCount()):
-            self.resizeRowToContents(row)
+# Crear una instancia de ScatterPlotDialog y mostrarla
+app = QApplication(sys.argv)
+dialog = ScatterPlotDialog(X_test, y_test, y_pred)
+dialog.exec_()
 
-        # Actualizar la vista y la geometría
-        self.viewport().update()
-        self.updateGeometry()
-
-if __name__ == '__main__':
-    app = QApplication([])
-
-    tabla_con_botones = TablaConBotones()
-
-    app.exec_()
+# Cerrar la aplicación al cerrar la ventana de gráfico
+sys.exit(app.exec_())

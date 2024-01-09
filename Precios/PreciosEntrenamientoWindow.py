@@ -4,7 +4,7 @@ from PySide6.QtCore import *
 from datetime import date #Para obtener la fecha de hoy
 import os #para obtener el nombre de un archivo a partir de la ruta completa
 import CSVUtil
-
+from MachineLearning.MLPrecios import MLPrecios
 class SeccionPedirDatos(QWidget):
     def __init__(self):
         super().__init__()
@@ -54,7 +54,7 @@ class SeccionAlgoritmo(QWidget):
 
         opciones_algoritmo = QComboBox()
         opciones_algoritmo.setParent(self)
-        opciones_algoritmo.addItems(['Selecciona un algoritmo','Random Forest', 'K-NN', 'Gradient Boosted Trees', 'Default Model', 'Deep Learning', 'Generalized Linear Model'])
+        opciones_algoritmo.addItems(['Selecciona un algoritmo','KNN','Redes Neuronales','Árbol de decisión'])
         opciones_algoritmo.activated.connect(self.parent().findChild(SeccionVistaPrevia).cargarVistaPrevia)
 
         layout.addWidget(label)
@@ -165,6 +165,7 @@ class BotonEjecutar(QPushButton):
         super().__init__()
         self.clicked.connect(self.ejecutar)
         self.setText("Ejecutar")
+        self.modelo = None
 
     def ejecutar(self):
         print("Se esta ejecutando")
@@ -189,7 +190,17 @@ class BotonEjecutar(QPushButton):
             mensaje.exec_()
         else: #Si se han expecificado los 
             print("todo correcto")
-        #TODO linkear a las librerías de machine learning
+        #'KNN','Redes Neuronales','Árbol de decisión'
+        ml_precios = MLPrecios()
+        if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
+            self.modelo = ml_precios.knn(ruta_fichero=ruta_fichero)
+            print("knn")
+        elif(self.parent().findChild(QComboBox).currentText() == 'Redes Neuronales'):
+            self.modelo = ml_precios.redes_neuronales(ruta_fichero=ruta_fichero)
+            print("redes neuronales")
+        elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
+            self.modelo = ml_precios.arbol_decision(ruta_fichero=ruta_fichero)
+            print("arbol decision")
 
 #TODO Hacer el widget para mostrar los resultados
 # class SeccionResultado(QWidget):
@@ -201,14 +212,28 @@ class BotonExportar(QPushButton):
         self.clicked.connect(self.exportar)
 
     def exportar(self):
-        # Obtener el nombre del archivo del usuario
-        options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getSaveFileName(self, "Guardar modelo", "", "Archivos (*.txt);;Todos los archivos (*)", options=options)
-
-        if fileName:
-            # Aquí es donde deberías realizar la lógica de exportación de tu modelo.
-            # fileName contiene la ruta del archivo seleccionado por el usuario.
-            print(f"Exportando modelo a: {fileName}")
+        modelo = self.parent().findChild(BotonEjecutar).modelo
+        if modelo is not None:
+            # Obtener el nombre del archivo del usuario
+            options = QFileDialog.Options()
+            fileName, _ = QFileDialog.getSaveFileName(self, "Guardar modelo", "", "Archivos (*.joblib);", options=options)
+            if fileName:
+                ml_precios = MLPrecios()
+                ml_precios.exportar(ruta_fichero=fileName, modelo = modelo)
+                mensaje = QMessageBox(self)
+                mensaje.setWindowTitle('Éxito')
+                mensaje.setText('El modelo se ha guardado correctamente')
+                mensaje.setIcon(QMessageBox.Information)
+                mensaje.setStandardButtons(QMessageBox.Ok)
+                mensaje.exec_()
+        else:
+            # Mostrar un mensaje de error si no hay modelo
+            mensaje = QMessageBox(self)
+            mensaje.setWindowTitle('Error')
+            mensaje.setText('No hay un modelo para exportar. Ejecuta un algoritmo primero.')
+            mensaje.setIcon(QMessageBox.Critical)
+            mensaje.setStandardButtons(QMessageBox.Ok)
+            mensaje.exec_()
         
 
 class EntrenamientoWindow(QWidget):
@@ -246,7 +271,7 @@ class EntrenamientoWindow(QWidget):
         exportar.setParent(self)
         # Llamar al método init_UI de SeccionVistaPrevia después de establecer los padres
         vista_previa.init_UI()
-        pedir_datos.init_UI('Fuente de datos A: ')
+        pedir_datos.init_UI('Fuente de datos para precios: ')
         pedir_algoritmo.init_UI()
 
         vista_previa.cargarVistaPrevia()

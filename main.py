@@ -3,8 +3,8 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-from EntrenamientoWindow import EntrenamientoWindow
-from PrediccionWindow import PrediccionWindow
+from Precios.PreciosWindow import PreciosWindow
+from Puntuacion.PuntuacionWindow import PuntuacionWindow
 
 "ENCABEZADO"
 class Header(QWidget):
@@ -29,19 +29,13 @@ class MainWindow(QMainWindow):
         header.show()
 
         "Pestañas"
-
-        # Crear el QTabWidget
         self.tabs = QTabWidget()
 
-        # Crear widgets para las pestañas
-        tab1 = EntrenamientoWindow()
-        tab2 = PrediccionWindow()
+        precios = PreciosWindow()
+        puntuacion = PuntuacionWindow()
 
-        # Agregar contenido a las pestañas
-        self.tabs.addTab(tab1, "Entrenamiento")
-        self.tabs.addTab(tab2, "Predicción")
-
-
+        self.tabs.addTab(precios, "Precios")
+        self.tabs.addTab(puntuacion, "Puntuacion")
         # Crear un widget central para la ventana y establecer el QTabWidget como widget central
         central_widget = QWidget(self)
         central_layout = QVBoxLayout(central_widget)
@@ -49,10 +43,10 @@ class MainWindow(QMainWindow):
         central_layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
 
-        # Ajustar el tamaño de la fuente de los títulos de las pestañas
-        font = self.tabs.tabBar().font()
-        font.setPointSize(14)  # Establecer el tamaño de la fuente de las pestañas
-        self.tabs.tabBar().setFont(font)
+        # # Ajustar el tamaño de la fuente de los títulos de las pestañas
+        # font = self.tabs.tabBar().font()
+        # font.setPointSize(14)  # Establecer el tamaño de la fuente de las pestañas
+        # self.tabs.tabBar().setFont(font)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
