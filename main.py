@@ -6,6 +6,8 @@ from PySide6.QtCore import *
 from Precios.PreciosWindow import PreciosWindow
 from Puntuacion.PuntuacionWindow import PuntuacionWindow
 
+from Login import Login
+
 "ENCABEZADO"
 class Header(QWidget):
     def __init__ (self):
@@ -18,8 +20,6 @@ class Header(QWidget):
         header_logo.setPixmap(QPixmap("./images/icono.png"))
 
         self.header_layout.addWidget(header_logo)
-
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -50,7 +50,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = Login()
     window.setWindowTitle("CactusPanda Predicciones Fútbol")
     window.setWindowIcon(QIcon("icono.png"))
     # Establecer la ventana para que ocupe toda la pantalla

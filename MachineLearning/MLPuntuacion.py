@@ -17,7 +17,7 @@ from sklearn.neural_network import MLPRegressor
 
 # Cargar el dataset desde un archivo CSV
 
-class MLPrecios:
+class MLPuntuacion:
     @staticmethod
     def knn(ruta_fichero):
         # Cargar el dataset desde un archivo CSV
@@ -165,3 +165,36 @@ class MLPrecios:
         model_filename = 'modelo_ArbolDeDecisiones.joblib'
         joblib.dump(modelo, ruta_fichero)
         print(f'Modelo guardado como {model_filename}')
+
+    def predecir_knn(ruta_modelo, datos):
+        # Cargar el modelo desde el archivo
+        loaded_model = joblib.load(ruta_modelo)
+
+        nuevos_datos = pd.DataFrame({'SOFASCORE': [7.9], 'puntos_SOFASCORE': [9], 'AS': [1], 'puntos_AS': [2], 'MD': [1], 'puntos_MD': [2], 'MARCA': [1], 'puntos_MARCA': [2], 'puntos_Goles': [0]})
+
+        # Realizar predicciones con los datos de prueba (o cualquier otro conjunto de datos)
+        nuevas_predicciones = loaded_model.predict(nuevos_datos)
+        
+        return nuevas_predicciones
+    
+    def predecir_redes_neuronales(ruta_modelo, datos):
+        # Cargar el modelo desde el archivo
+        loaded_model = joblib.load(ruta_modelo)
+
+        nuevos_datos = pd.DataFrame({'SOFASCORE': [7.9], 'puntos_SOFASCORE': [9], 'AS': [1], 'puntos_AS': [2], 'MD': [1], 'puntos_MD': [2], 'MARCA': [1], 'puntos_MARCA': [2], 'puntos_Goles': [0]})
+
+        # Realizar predicciones con los datos de prueba (o cualquier otro conjunto de datos)
+        nuevas_predicciones = loaded_model.predict(nuevos_datos)
+        
+        return nuevas_predicciones
+    
+    def predecir_arbol_decision(ruta_fichero, datos):
+        # Cargar el modelo desde el archivo
+        loaded_model = joblib.load('modelo_ArbolDeDecisiones.joblib')
+
+        nuevos_datos = pd.DataFrame({'SOFASCORE': [7.9], 'puntos_SOFASCORE': [9], 'AS': [1], 'puntos_AS': [2], 'MD': [1], 'puntos_MD': [2], 'MARCA': [1], 'puntos_MARCA': [2], 'puntos_Goles': [0]})
+
+        # Realizar predicciones con los datos de prueba (o cualquier otro conjunto de datos)
+        nuevas_predicciones = loaded_model.predict(nuevos_datos)
+
+        return nuevas_predicciones
