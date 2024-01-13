@@ -1,7 +1,7 @@
 {
   "user-data": {
-    "password": "",
-    "email": ""
+    "password": "PC1LigaFantasy.",
+    "email": "pc1ligafantasy@gmail.com"
   },
   "formations": {
     "free": [
@@ -20,5 +20,55 @@
       "3-6-1",
       "5-5-0"
     ]
-  }
+  },
+  "jornada-data": {
+    "prox-jornada": "Jornada 20",
+    "time-remaining": "En juego\n2 de 11 han jugado"
+  },
+  "money-data": {
+    "actual-money": 9735860,
+    "future-money": 9735860,
+    "max-debt": 32569860
+  },
+  "plantilla": {
+    "actual-formation": {
+      "team": {
+        "gk": [
+          56
+        ],
+        "defense": [
+          8952,
+          19977,
+          25872
+        ],
+        "mid": [
+          23173,
+          25867,
+          40093,
+          55484
+        ],
+        "att": [
+          18004,
+          48657,
+          52375
+        ]
+      },
+      "formation": "3-4-3"
+    },
+    "all_player": [
+      56,
+      8952,
+      25872,
+      19977,
+      25867,
+      40093,
+      55484,
+      23173,
+      18004,
+      52375,
+      33032,
+      48657
+    ]
+  },
+  "last-update": "2024-01-13 16:16:59"
 }

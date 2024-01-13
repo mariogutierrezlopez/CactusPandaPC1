@@ -4,6 +4,7 @@ from PySide6.QtCore import *
 from datetime import date #Para obtener la fecha de hoy
 import os #para obtener el nombre de un archivo a partir de la ruta completa
 import CSVUtil
+from MachineLearning import MLPrecios
 
 class SeccionPedirDatos(QWidget):
     def __init__(self):
@@ -54,7 +55,7 @@ class SeccionAlgoritmo(QWidget):
 
         opciones_algoritmo = QComboBox()
         opciones_algoritmo.setParent(self)
-        opciones_algoritmo.addItems(['Selecciona un algoritmo','KNN','Redes Neuronales','Árbol de decisión'])
+        opciones_algoritmo.addItems(['Selecciona un algoritmo','KNN','Árbol de decisión','Random Forest'])
         opciones_algoritmo.activated.connect(self.parent().findChild(SeccionVistaPrevia).cargarVistaPrevia)
 
         layout.addWidget(label)
@@ -190,17 +191,16 @@ class BotonEjecutar(QPushButton):
             mensaje.exec_()
         else: #Si se han expecificado los 
             print("todo correcto")
-        #'KNN','Redes Neuronales','Árbol de decisión'
-        # ml_precios = MLPrecios()
-        # if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
-        #     self.modelo = ml_precios.knn(ruta_fichero=ruta_fichero)
-        #     print("knn")
-        # elif(self.parent().findChild(QComboBox).currentText() == 'Redes Neuronales'):
-        #     self.modelo = ml_precios.redes_neuronales(ruta_fichero=ruta_fichero)
-        #     print("redes neuronales")
-        # elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
-        #     self.modelo = ml_precios.arbol_decision(ruta_fichero=ruta_fichero)
-        #     print("arbol decision")
+        #'KNN','Árbol de decisión','Random Forest'
+        if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
+            self.modelo = MLPrecios.knn(ruta_fichero=ruta_fichero)
+            print("knn")
+        elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
+            self.modelo = MLPrecios.arbol_decision(ruta_fichero=ruta_fichero)
+            print("redes decision")
+        elif(self.parent().findChild(QComboBox).currentText() == 'Random Forest'):
+            self.modelo = MLPrecios.random_forest(ruta_fichero=ruta_fichero)
+            print("random forest")
 
 #TODO Hacer el widget para mostrar los resultados
 # class SeccionResultado(QWidget):
@@ -218,9 +218,7 @@ class BotonExportar(QPushButton):
             options = QFileDialog.Options()
             fileName, _ = QFileDialog.getSaveFileName(self, "Guardar modelo", "", "Archivos (*.joblib);", options=options)
             if fileName:
-                # ml_precios = MLPrecios()
-                # ml_precios.exportar(ruta_fichero=fileName, modelo = modelo)
-                #TODO exportar archivo
+                MLPrecios.exportar_modelo(modelo = modelo, ruta_fichero = fileName)
                 mensaje = QMessageBox(self)
                 mensaje.setWindowTitle('Éxito')
                 mensaje.setText('El modelo se ha guardado correctamente')
