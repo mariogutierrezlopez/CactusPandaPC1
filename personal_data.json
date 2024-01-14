@@ -23,12 +23,12 @@
   },
   "jornada-data": {
     "prox-jornada": "Jornada 20",
-    "time-remaining": "En juego\n2 de 11 han jugado"
+    "time-remaining": "En juego\n7 de 11 han jugado"
   },
   "money-data": {
     "actual-money": 9735860,
     "future-money": 9735860,
-    "max-debt": 32569860
+    "max-debt": 32460610
   },
   "plantilla": {
     "actual-formation": {
@@ -70,5 +70,5 @@
       48657
     ]
   },
-  "last-update": "2024-01-13 16:16:59"
+  "last-update": "2024-01-14 17:21:11"
 }

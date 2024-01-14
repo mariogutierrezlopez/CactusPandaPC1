@@ -64,7 +64,7 @@ def save_data(data):
 
 # def update_data(data):
 
-def get_datos_por_id(id):
+def get_datos_por_id_precios(id):
     # Cargar el archivo CSV en un DataFrame
     df = pd.read_csv('./data/exactPricesPlayer_23-24.csv')
 
@@ -76,6 +76,22 @@ def get_datos_por_id(id):
 
     return ultima_fila_id_buscado
 
+
+def get_datos_por_id_puntuacion(id):
+    # Cargar el archivo CSV en un DataFrame
+    df = pd.read_csv('./data/jugadoresFantasyActualizado.csv')
+
+    # Filtrar las filas que coincidan con el ID
+    fila_id_buscado = df[df['ID'] == id]
+
+    # Filtrar las filas que no contengan NaN
+    fila_sin_nan = fila_id_buscado[fila_id_buscado.notna().all(axis=1)]
+
+    # Seleccionar la última fila después de la filtración
+    ultima_fila_sin_nan = fila_sin_nan.iloc[-1]
+
+    return ultima_fila_sin_nan
+
 def get_players_data_to_dataframe():
     with open('personal_data.json', 'r', encoding='utf-8') as archivo_json:
         data = json.load(archivo_json)
@@ -83,9 +99,36 @@ def get_players_data_to_dataframe():
     player_ids = data["plantilla"]["all_player"]
     df_resultado = pd.DataFrame()
     for player_id in player_ids:
-        datos_player = get_datos_por_id(player_id)
+        datos_player = get_datos_por_id_precios(player_id)
         df_resultado = df_resultado._append({'ID': player_id, 'Nombre': datos_player['Name'],'Price': datos_player['Price'], 'AveragePoints': datos_player['AveragePoints'], 
                    'Goals': datos_player['Goals'], 'Matches': datos_player['Matches'], 'AveragePtsLastThreeMatches': datos_player['AveragePtsLastThreeMatches'],
                    'AverageCardsLastThreeMatches': datos_player['AverageCardsLastThreeMatches']}, ignore_index=True)
+    
+    return df_resultado
+
+def get_plantilla_puntuacion():
+    with open('personal_data.json', 'r', encoding='utf-8') as archivo_json:
+        data = json.load(archivo_json)
+
+    player_ids = data["plantilla"]["all_player"]
+    df_resultado = pd.DataFrame()
+    for player_id in player_ids:
+        datos_player = get_datos_por_id_puntuacion(player_id)
+        print(datos_player)
+        df_resultado = df_resultado._append({
+            'ID': player_id,
+            'Nombre': datos_player['Name'],
+            'Ultima jornada': datos_player['Jornada'],
+            'Puntos totales': int(datos_player['puntos_Jornada']),
+            'SOFASCORE': datos_player['SOFASCORE'],
+            'puntos_SOFASCORE': int(datos_player['puntos_SOFASCORE']),
+            'AS': int(datos_player['AS']),
+            'puntos_AS': int(datos_player['puntos_AS']),
+            'MD': int(datos_player['MD']),
+            'puntos_MD': int(datos_player['puntos_MD']),
+            'MARCA': int(datos_player['MARCA']),
+            'puntos_MARCA': int(datos_player['puntos_MARCA']),
+            'puntos_Goles': int(datos_player['puntos_Goles'])
+        }, ignore_index=True)
     
     return df_resultado

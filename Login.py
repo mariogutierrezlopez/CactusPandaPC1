@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import csv
 
 from MainWindow import MainWindow
 import JSONUtil
@@ -30,6 +30,7 @@ class Login(QWidget):
         layout = QFormLayout()
         logo = QLabel()
         logo.setPixmap(QPixmap("./images/icono.png"))
+        logo.setAlignment(Qt.AlignCenter)
         layout.addRow(logo)
         layout.addWidget(QLabel("Se ha encontrado una sesion abierta"))
         layout.addWidget(QLabel("Email: " + data["user-data"]["email"]))
@@ -45,6 +46,24 @@ class Login(QWidget):
         layout.addWidget(cerrar_sesion_button)
         layout.setFormAlignment(Qt.AlignCenter)
         layout.setLabelAlignment(Qt.AlignCenter)
+
+        # Establecer márgenes proporcionales al espacio disponible
+        margen_proporcional = 1 # Ajusta según sea necesario
+
+        # Obtener el ancho y alto de la ventana
+        ancho_ventana = self.width()
+        alto_ventana = self.height()
+
+        # Calcular los márgenes proporcionales
+        margen_izquierdo = ancho_ventana * margen_proporcional
+        margen_derecho = ancho_ventana * margen_proporcional
+        margen_superior = alto_ventana * margen_proporcional
+        margen_inferior = alto_ventana * margen_proporcional
+
+        # Establecer márgenes
+        layout.setContentsMargins(margen_izquierdo, 0, margen_derecho, 0)
+       
+
 
         self.setLayout(layout)
         self.setStyleSheet("""
@@ -78,8 +97,10 @@ class Login(QWidget):
         """)
         
     def initUINuevo(self):
+
         logo = QLabel()
         logo.setPixmap(QPixmap("./images/icono.png"))
+        logo.setAlignment(Qt.AlignCenter)
         self.email = QLineEdit()
         self.email.setPlaceholderText('Correo electrónico')
         self.password = QLineEdit()
@@ -95,6 +116,23 @@ class Login(QWidget):
         self.layout.addRow(self.boton)
         self.layout.setFormAlignment(Qt.AlignCenter)
         self.layout.setLabelAlignment(Qt.AlignRight)
+
+        # Establecer márgenes proporcionales al espacio disponible
+        margen_proporcional = 1 # Ajusta según sea necesario
+
+        # Obtener el ancho y alto de la ventana
+        ancho_ventana = self.width()
+        alto_ventana = self.height()
+
+        # Calcular los márgenes proporcionales
+        margen_izquierdo = ancho_ventana * margen_proporcional
+        margen_derecho = ancho_ventana * margen_proporcional
+        margen_superior = alto_ventana * margen_proporcional
+        margen_inferior = alto_ventana * margen_proporcional
+
+        # Establecer márgenes
+        self.layout.setContentsMargins(margen_izquierdo, 0, margen_derecho, 0)
+       
 
         self.setLayout(self.layout)
 
@@ -356,15 +394,55 @@ class SeleniumThread(QThread):
 
                 JSONUtil.save_data(data)
 
+                        
+                driver.get('https://mister.mundodeportivo.com/market')
+
+                player_list = driver.find_element(By.ID, 'list-on-sale')
+
+                players_on_sale = player_list.find_elements(By.TAG_NAME, 'li')
+
+                market_content = []
+
+                csv_file_path = './data/currentMarket.csv'
+
+                with open(csv_file_path, mode = 'w', newline = '', encoding = 'utf-8') as archivo_csv:
+                    escritor = csv.writer(archivo_csv)
+
+                    # Escribir encabezados
+                    escritor.writerow(['PlayerId', 'PlayerName', 'PlayerPosition', 'PlayerOwner',
+                                    'DataPrice', 'OwnerPrice', 'MaxPrice', 'MinPrice', 'TimeRemaining'])
+
+                for p in players_on_sale:
+
+                    if 'player' in p.get_attribute('class'):
+                        player_id = p.find_element(By.CLASS_NAME, 'player-pic').get_attribute('data-id_player')
+                        player_name = p.find_element(By.CLASS_NAME, 'btn-sw-link').get_attribute('data-title')
+                        player_position = p.get_attribute('data-position')
+                        data_price = p.get_attribute('data-price')
+                        owner_price = p.find_element(By.CLASS_NAME, 'btn-bid').get_attribute('data-value')
+                        print(owner_price)
+                        max_price = int(int(owner_price) * 1.10)
+                        min_price = int(int(owner_price) * 0.95)
+                        player_owner = p.get_attribute('data-owner')
+                        time_remaining = p.get_attribute('data-ends')
+
+                        player = [player_id, player_name, player_position, player_owner, data_price,
+                                owner_price, max_price, min_price, time_remaining]
+
+                        with open(csv_file_path, mode = 'a', newline = '', encoding = 'utf-8') as archivo_csv:
+                            escritor = csv.writer(archivo_csv)
+
+                            # Escribir encabezados
+                            escritor.writerow(player)
             else:
                 resultado = False
         except Exception as e:
             print(f"Error: {e}")
             resultado = False
         finally:
-            # Cerrar el navegador en cualquier caso
+            # Cerrar el navegador en cualquier 
             driver.quit()
-            return resultado
+        return resultado
 
 class ActualizarSeleniumThread(QThread):
     actualizar_datos_finished = Signal()
@@ -520,5 +598,46 @@ class ActualizarSeleniumThread(QThread):
         data["plantilla"]["all_player"] = link_players
 
         JSONUtil.save_data(data=data)
+        
+        driver.get('https://mister.mundodeportivo.com/market')
+
+        player_list = driver.find_element(By.ID, 'list-on-sale')
+
+        players_on_sale = player_list.find_elements(By.TAG_NAME, 'li')
+
+        market_content = []
+
+        csv_file_path = './data/currentMarket.csv'
+
+        with open(csv_file_path, mode = 'w', newline = '', encoding = 'utf-8') as archivo_csv:
+            escritor = csv.writer(archivo_csv)
+
+            # Escribir encabezados
+            escritor.writerow(['PlayerId', 'PlayerName', 'PlayerPosition', 'PlayerOwner',
+                            'DataPrice', 'OwnerPrice', 'MaxPrice', 'MinPrice', 'TimeRemaining'])
+
+        for p in players_on_sale:
+
+            if 'player' in p.get_attribute('class'):
+                player_id = p.find_element(By.CLASS_NAME, 'player-pic').get_attribute('data-id_player')
+                player_name = p.find_element(By.CLASS_NAME, 'btn-sw-link').get_attribute('data-title')
+                player_position = p.get_attribute('data-position')
+                data_price = p.get_attribute('data-price')
+                owner_price = p.find_element(By.CLASS_NAME, 'btn-bid').get_attribute('data-value')
+                print(owner_price)
+                max_price = int(int(owner_price) * 1.10)
+                min_price = int(int(owner_price) * 0.95)
+                player_owner = p.get_attribute('data-owner')
+                time_remaining = p.get_attribute('data-ends')
+
+                player = [player_id, player_name, player_position, player_owner, data_price,
+                        owner_price, max_price, min_price, time_remaining]
+
+                with open(csv_file_path, mode = 'a', newline = '', encoding = 'utf-8') as archivo_csv:
+                    escritor = csv.writer(archivo_csv)
+
+                    # Escribir encabezados
+                    escritor.writerow(player)
+
         driver.quit()
         self.actualizar_datos_finished.emit()

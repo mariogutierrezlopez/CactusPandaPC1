@@ -5,7 +5,10 @@ from datetime import date #Para obtener la fecha de hoy
 import os #para obtener el nombre de un archivo a partir de la ruta completa
 import CSVUtil
 from MachineLearning import MLPrecios
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import pandas as pd
+from MachineLearning import MLPrecios
 class SeccionPedirDatos(QWidget):
     def __init__(self):
         super().__init__()
@@ -169,6 +172,7 @@ class BotonEjecutar(QPushButton):
         self.modelo = None
 
     def ejecutar(self):
+        self.seccionResultado = self.parent().findChild(SeccionResultado)
         print("Se esta ejecutando")
         ruta_fichero = self.parent().findChild(QLineEdit).text()
         algoritmo = self.parent().findChild(QComboBox).currentText()
@@ -192,8 +196,10 @@ class BotonEjecutar(QPushButton):
         else: #Si se han expecificado los 
             print("todo correcto")
         #'KNN','Árbol de decisión','Random Forest'
+        seccion_grafica = self.parent().findChild(SeccionResultado)
         if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
-            self.modelo = MLPrecios.knn(ruta_fichero=ruta_fichero)
+            self.modelo, X_test, y_test = MLPrecios.knn(ruta_fichero=ruta_fichero)
+            self.seccion_resultado.KNN(self.modelo, X_test, y_test)
             print("knn")
         elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
             self.modelo = MLPrecios.arbol_decision(ruta_fichero=ruta_fichero)
@@ -204,6 +210,44 @@ class BotonEjecutar(QPushButton):
 
 #TODO Hacer el widget para mostrar los resultados
 # class SeccionResultado(QWidget):
+#TODO Hacer el widget para mostrar los resultados
+class SeccionResultado(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_UI()
+
+    def init_UI(self):
+        layout = QVBoxLayout()
+
+        label = QLabel("Gráfica:")
+        label.setParent(self)
+
+        self.figure, self.ax = plt.subplots()
+        self.canvas = FigureCanvas(self.figure)
+        layout.addWidget(label)
+        layout.addWidget(self.canvas)
+        self.setLayout(layout)
+        
+
+    def KNN(self, knn_model, X_test, y_test):
+        print("Grafica KNN")
+        # Realizar predicciones con los datos de prueba
+        y_pred = knn_model.predict(X_test)
+
+        # Generar el gráfico de dispersión con puntos de predicción
+        self.ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
+        self.ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
+        self.ax.set_xlabel('SOFASCORE')
+        self.ax.set_ylabel('puntos_Jornada')
+        self.ax.set_title('Gráfico de Dispersión con KNN de Predicción de Puntos Jornada')
+        self.ax.legend()
+
+        # Actualizar el canvas
+        self.canvas.draw()
+
+        # Puedes establecer el texto de la etiqueta KNN aquí si lo necesitas
+        self.labelKNN.setText("AAAHHHH")
+        print("ASDF")
 
 class BotonExportar(QPushButton):
     def __init__(self):
@@ -245,7 +289,7 @@ class EntrenamientoWindow(QWidget):
         pedir_algoritmo = SeccionAlgoritmo()
         vista_previa = SeccionVistaPrevia()
         ejecutar = BotonEjecutar()
-        #TODO añadir aqui el apartado de resultados
+        seccion_resultado = SeccionResultado()
         exportar = BotonExportar()
 
         layout = QVBoxLayout()
@@ -253,7 +297,7 @@ class EntrenamientoWindow(QWidget):
         layout.addWidget(pedir_algoritmo)
         layout.addWidget(vista_previa)
         layout.addWidget(ejecutar)
-        #TODO añadir al layout el apartado de resultados
+        layout.addWidget(seccion_resultado)
         layout.addStretch()
         layout.addWidget(exportar)
         self.setLayout(layout)
@@ -266,7 +310,7 @@ class EntrenamientoWindow(QWidget):
         pedir_datos.setParent(self)
         pedir_algoritmo.setParent(self)
         ejecutar.setParent(self)
-        #TODO poner .setParent(self) al apartado de resultados
+        seccion_resultado.setParent(self)
         exportar.setParent(self)
         # Llamar al método init_UI de SeccionVistaPrevia después de establecer los padres
         vista_previa.init_UI()

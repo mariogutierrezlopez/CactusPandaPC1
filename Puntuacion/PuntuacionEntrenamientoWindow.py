@@ -5,7 +5,7 @@ from datetime import date #Para obtener la fecha de hoy
 import os #para obtener el nombre de un archivo a partir de la ruta completa
 import CSVUtil
 
-from MachineLearning.MLPuntuacion import MLPuntuacion
+from MachineLearning import MLPuntuacion
 
 class SeccionPedirDatos(QWidget):
     def __init__(self):
@@ -193,15 +193,14 @@ class BotonEjecutar(QPushButton):
         else: #Si se han expecificado los 
             print("todo correcto")
         #'KNN','Redes Neuronales','Árbol de decisión'
-        ml_puntuacion = MLPuntuacion()
         if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
-            self.modelo = ml_puntuacion.knn(ruta_fichero=ruta_fichero)
+            self.modelo = MLPuntuacion.knn(ruta_fichero=ruta_fichero)
             print("knn")
         elif(self.parent().findChild(QComboBox).currentText() == 'Redes Neuronales'):
-            self.modelo = ml_puntuacion.redes_neuronales(ruta_fichero=ruta_fichero)
+            self.modelo = MLPuntuacion.redes_neuronales(ruta_fichero=ruta_fichero)
             print("redes neuronales")
         elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
-            self.modelo = ml_puntuacion.arbol_decision(ruta_fichero=ruta_fichero)
+            self.modelo = MLPuntuacion.arbol_decision(ruta_fichero=ruta_fichero)
             print("arbol decision")
 
 #TODO Hacer el widget para mostrar los resultados
@@ -218,8 +217,7 @@ class BotonExportar(QPushButton):
             options = QFileDialog.Options()
             fileName, _ = QFileDialog.getSaveFileName(self, "Guardar modelo", "", "Archivos (*.joblib);", options=options)
             if fileName:
-                ml_puntuacion = MLPuntuacion()
-                ml_puntuacion.exportar(ruta_fichero=fileName, modelo = modelo)
+                MLPuntuacion.exportar(ruta_fichero=fileName, modelo = modelo)
                 mensaje = QMessageBox(self)
                 mensaje.setWindowTitle('Éxito')
                 mensaje.setText('El modelo se ha guardado correctamente')
