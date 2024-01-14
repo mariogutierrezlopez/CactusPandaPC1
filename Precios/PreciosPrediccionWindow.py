@@ -138,7 +138,27 @@ class BotonPredecir(QPushButton):
             
 
         elif(not datosMiEquipo and fichero_csv and fichero_modelo):
-            print("true")
+            df_plantilla = CSVUtil.get_custom_precio()
+            df_predecir_plantilla = df_plantilla.drop(['ID', 'Nombre', 'Price'], axis=1)
+            resultado_modelo = MLPrecios.predecir(modelo = MLPrecios.importar_modelo(fichero_modelo), ejemplares=df_predecir_plantilla)
+            
+            df_plantilla.insert(3, 'Precio predecido', resultado_modelo)
+
+            tabla_predicciones = self.parent().findChild(TablaPrediccionesPlantilla)
+            tabla_predicciones.cargarDatos(df_plantilla)
+
+            df_mercado = CSVUtil.get_market_players_dataframe()
+            df_predecir_mercado = df_mercado.drop(['ID', 'Nombre', 'Price'], axis=1)
+
+            resultado_modelo = MLPrecios.predecir(modelo = MLPrecios.importar_modelo(fichero_modelo), ejemplares=df_predecir_mercado)
+            
+            df_mercado.insert(3, 'Precio predecido', resultado_modelo)
+
+            tabla_mercado = self.parent().findChild(TablaPrediccionesMercado)
+            tabla_mercado.cargarDatos(df_mercado)
+
+            self.datos_plantilla = df_plantilla
+            self.datos_mercado = df_mercado
         else:
             mensaje = QMessageBox(self)
             mensaje.setWindowTitle('Error')

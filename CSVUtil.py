@@ -39,7 +39,6 @@ def obtener_tamano_archivo(ruta):
         return None
 
 def obtener_titulos_csv(nombre_archivo):
-    print(nombre_archivo)
     with open(nombre_archivo, newline='', encoding='utf-8') as archivo_csv:
         lector_csv = csv.reader(archivo_csv)
         # Leer la primera fila que contiene los títulos
@@ -153,10 +152,7 @@ def get_puntuacion_mercado():
         
     df_resultado = pd.DataFrame()
     for player_id in player_ids:
-        print("Probando la id: ")
-        print(player_id)
         datos_player = get_datos_por_id_puntuacion(player_id)
-        print(datos_player)
         if(isinstance(datos_player, dict)):
             df_resultado = df_resultado._append({
                     'ID': player_id,
@@ -207,5 +203,71 @@ def get_puntuacion_mercado():
                     'puntos_Goles': 0
                 }, ignore_index=True)
 
+    
+    return df_resultado
+
+def get_custom_puntuacion():
+    with open('./data/customPlayers.csv', newline='', encoding='utf-8') as csvfile:
+        # Crea un lector CSV
+        csv_reader = csv.reader(csvfile)
+
+        # Lee la primera línea del archivo (encabezados)
+        headers = next(csv_reader)
+
+        # Encuentra el índice de la columna 'PlayerId'
+        player_id_index = headers.index('PlayerId')
+
+        # Crea un array para almacenar las IDs de los jugadores
+        player_ids = []
+
+        # Lee cada fila y extrae la ID del jugador
+        for row in csv_reader:
+            player_id = int(row[player_id_index])
+            player_ids.append(player_id)
+    df_resultado = pd.DataFrame()
+    for player_id in player_ids:
+        datos_player = get_datos_por_id_puntuacion(player_id)
+        df_resultado = df_resultado._append({
+                    'ID': player_id,
+                    'Nombre': datos_player['Name'],
+                    'Ultima jornada': datos_player['Jornada'],
+                    'Puntos totales': int(datos_player['puntos_Jornada']),
+                    'SOFASCORE': datos_player['SOFASCORE'],
+                    'puntos_SOFASCORE': int(datos_player['puntos_SOFASCORE']),
+                    'AS': int(datos_player['AS']),
+                    'puntos_AS': int(datos_player['puntos_AS']),
+                    'MD': int(datos_player['MD']),
+                    'puntos_MD': int(datos_player['puntos_MD']),
+                    'MARCA': int(datos_player['MARCA']),
+                    'puntos_MARCA': int(datos_player['puntos_MARCA']),
+                    'puntos_Goles': int(datos_player['puntos_Goles'])
+                }, ignore_index=True)
+    
+    return df_resultado
+
+def get_custom_precio():
+    with open('./data/customPlayers.csv', newline='', encoding='utf-8') as csvfile:
+        # Crea un lector CSV
+        csv_reader = csv.reader(csvfile)
+
+        # Lee la primera línea del archivo (encabezados)
+        headers = next(csv_reader)
+
+        # Encuentra el índice de la columna 'PlayerId'
+        player_id_index = headers.index('PlayerId')
+
+        # Crea un array para almacenar las IDs de los jugadores
+        player_ids = []
+
+        # Lee cada fila y extrae la ID del jugador
+        for row in csv_reader:
+            player_id = int(row[player_id_index])
+            player_ids.append(player_id)
+    df_resultado = pd.DataFrame()
+    for player_id in player_ids:
+        datos_player = get_datos_por_id_precios(player_id)
+        df_resultado = df_resultado._append({'ID': player_id, 'Nombre': datos_player['Name'],'Price': datos_player['Price'], 'AveragePoints': datos_player['AveragePoints'], 
+                   'Goals': datos_player['Goals'], 'Matches': datos_player['Matches'], 'AveragePtsLastThreeMatches': datos_player['AveragePtsLastThreeMatches'],
+                   'AverageCardsLastThreeMatches': datos_player['AverageCardsLastThreeMatches']}, ignore_index=True)
     
     return df_resultado
