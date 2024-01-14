@@ -138,7 +138,6 @@ class BotonPredecir(QPushButton):
 
         elif(not datosMiEquipo and fichero_csv and fichero_modelo):
             df_plantilla = CSVUtil.get_custom_puntuacion()
-            print(df_plantilla.columns.list())
             df_predecir_plantilla = df_plantilla.drop(['ID', 'Nombre', 'Ultima jornada', 'Puntos totales'], axis=1)
             resultado_modelo = MLPuntuacion.predecir(modelo = MLPuntuacion.importar_modelo(fichero_modelo), ejemplares=df_predecir_plantilla)
             

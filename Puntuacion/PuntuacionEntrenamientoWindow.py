@@ -4,6 +4,9 @@ from PySide6.QtCore import *
 from datetime import date #Para obtener la fecha de hoy
 import os #para obtener el nombre de un archivo a partir de la ruta completa
 import CSVUtil
+import PLTUtil
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 from MachineLearning import MLPuntuacion
 
@@ -193,17 +196,53 @@ class BotonEjecutar(QPushButton):
         else: #Si se han expecificado los 
             print("todo correcto")
         #'KNN','Redes Neuronales','Árbol de decisión'
+        seccion_resultado = self.parent().findChild(SeccionResultado)
         if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
             self.modelo = MLPuntuacion.knn(ruta_fichero=ruta_fichero)
+            seccion_resultado.knn()
             print("knn")
         elif(self.parent().findChild(QComboBox).currentText() == 'Redes Neuronales'):
             self.modelo = MLPuntuacion.redes_neuronales(ruta_fichero=ruta_fichero)
+            seccion_resultado.neural_network()
             print("redes neuronales")
         elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
             self.modelo = MLPuntuacion.arbol_decision(ruta_fichero=ruta_fichero)
+            seccion_resultado.decision_tree()
             print("arbol decision")
+class SeccionResultado(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_UI()
 
-#TODO Hacer el widget para mostrar los resultados
+    def init_UI(self):
+        layout = QVBoxLayout()
+
+        label = QLabel("Gráfica:")
+        label.setParent(self)
+
+        self.figure, self.ax = plt.subplots()
+
+        self.canvas = FigureCanvas(self.figure)
+        layout.addWidget(label)
+        layout.addWidget(self.canvas)
+        self.setLayout(layout)
+
+        self.grafica_vacia()
+
+    def grafica_vacia(self):
+        PLTUtil.grafica_vacia(self.ax)
+
+    def knn(self):
+        PLTUtil.knn_puntos_jornada(self.ax)  # Pasa el eje a la función knn_precios
+        self.canvas.draw()
+    def neural_network(self):
+        PLTUtil.red_neuronal_puntos_jornada(self.ax)
+        self.canvas.draw()
+    
+    def random_forest(self):
+        PLTUtil.arbol_decision_puntos_jornada(self.ax)
+        self.canvas.draw()
+
 # class SeccionResultado(QWidget):
 class BotonExportar(QPushButton):
     def __init__(self):
@@ -244,7 +283,7 @@ class EntrenamientoWindow(QWidget):
         pedir_algoritmo = SeccionAlgoritmo()
         vista_previa = SeccionVistaPrevia()
         ejecutar = BotonEjecutar()
-        #TODO añadir aqui el apartado de resultados
+        seccion_resultado = SeccionResultado()
         exportar = BotonExportar()
 
         layout = QVBoxLayout()
@@ -252,7 +291,7 @@ class EntrenamientoWindow(QWidget):
         layout.addWidget(pedir_algoritmo)
         layout.addWidget(vista_previa)
         layout.addWidget(ejecutar)
-        #TODO añadir al layout el apartado de resultados
+        layout.addWidget(seccion_resultado)
         layout.addStretch()
         layout.addWidget(exportar)
         self.setLayout(layout)
@@ -265,7 +304,7 @@ class EntrenamientoWindow(QWidget):
         pedir_datos.setParent(self)
         pedir_algoritmo.setParent(self)
         ejecutar.setParent(self)
-        #TODO poner .setParent(self) al apartado de resultados
+        seccion_resultado.setParent(self)
         exportar.setParent(self)
         # Llamar al método init_UI de SeccionVistaPrevia después de establecer los padres
         vista_previa.init_UI()

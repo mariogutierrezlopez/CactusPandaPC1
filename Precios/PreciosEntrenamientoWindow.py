@@ -8,7 +8,7 @@ from MachineLearning import MLPrecios
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import pandas as pd
-from MachineLearning import MLPrecios
+import PLTUtil
 class SeccionPedirDatos(QWidget):
     def __init__(self):
         super().__init__()
@@ -196,21 +196,20 @@ class BotonEjecutar(QPushButton):
         else: #Si se han expecificado los 
             print("todo correcto")
         #'KNN','Árbol de decisión','Random Forest'
-        seccion_grafica = self.parent().findChild(SeccionResultado)
+        seccion_resultado = self.parent().findChild(SeccionResultado)
         if(self.parent().findChild(QComboBox).currentText() == 'KNN'):
-            self.modelo, X_test, y_test = MLPrecios.knn(ruta_fichero=ruta_fichero)
-            self.seccion_resultado.KNN(self.modelo, X_test, y_test)
+            self.modelo = MLPrecios.knn(ruta_fichero=ruta_fichero)
+            seccion_resultado.knn()
             print("knn")
         elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
             self.modelo = MLPrecios.arbol_decision(ruta_fichero=ruta_fichero)
+            seccion_resultado.decision_tree()
             print("redes decision")
         elif(self.parent().findChild(QComboBox).currentText() == 'Random Forest'):
             self.modelo = MLPrecios.random_forest(ruta_fichero=ruta_fichero)
+            seccion_resultado.random_forest()
             print("random forest")
 
-#TODO Hacer el widget para mostrar los resultados
-# class SeccionResultado(QWidget):
-#TODO Hacer el widget para mostrar los resultados
 class SeccionResultado(QWidget):
     def __init__(self):
         super().__init__()
@@ -223,31 +222,27 @@ class SeccionResultado(QWidget):
         label.setParent(self)
 
         self.figure, self.ax = plt.subplots()
+
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(label)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        
 
-    def KNN(self, knn_model, X_test, y_test):
-        print("Grafica KNN")
-        # Realizar predicciones con los datos de prueba
-        y_pred = knn_model.predict(X_test)
+        self.grafica_vacia()
 
-        # Generar el gráfico de dispersión con puntos de predicción
-        self.ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
-        self.ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
-        self.ax.set_xlabel('SOFASCORE')
-        self.ax.set_ylabel('puntos_Jornada')
-        self.ax.set_title('Gráfico de Dispersión con KNN de Predicción de Puntos Jornada')
-        self.ax.legend()
+    def grafica_vacia(self):
+        PLTUtil.grafica_vacia(self.ax)
 
-        # Actualizar el canvas
+    def knn(self):
+        PLTUtil.knn_precios(self.ax)  # Pasa el eje a la función knn_precios
         self.canvas.draw()
-
-        # Puedes establecer el texto de la etiqueta KNN aquí si lo necesitas
-        self.labelKNN.setText("AAAHHHH")
-        print("ASDF")
+    def decision_tree(self):
+        PLTUtil.decision_tree_precios(self.ax)
+        self.canvas.draw()
+    
+    def random_forest(self):
+        PLTUtil.random_forest_precios(self.ax)
+        self.canvas.draw()
 
 class BotonExportar(QPushButton):
     def __init__(self):
