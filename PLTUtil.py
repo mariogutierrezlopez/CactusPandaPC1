@@ -216,7 +216,7 @@ def knn_puntos_jornada(ax):
     # Generar el gráfico de dispersión con puntos de predicción
     ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
     ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
-    ax.plot(X_test['SOFASCORE'], knn_model.predict(X_test), color='red', linewidth=2, label='KNN')
+    #ax.plot(X_test['SOFASCORE'], knn_model.predict(X_test), color='red', linewidth=2, label='KNN')
     ax.set_xlabel('SOFASCORE')
     ax.set_ylabel('puntos_Jornada')
     ax.set_title('Gráfico de Dispersión con KNN de Predicción de Puntos Jornada')
@@ -269,7 +269,7 @@ def red_neuronal_puntos_jornada(ax):
     # Generar el gráfico de dispersión con puntos de predicción
     ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
     ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
-    ax.plot(X_test['SOFASCORE'], y_pred, color='red', linewidth=2, label='Red Neuronal')
+    #ax.plot(X_test['SOFASCORE'], y_pred, color='red', linewidth=2, label='Red Neuronal')
     ax.set_xlabel('SOFASCORE')
     ax.set_ylabel('puntos_Jornada')
     ax.set_title('Gráfico de Dispersión con Red Neuronal de Predicción de Puntos Jornada')
@@ -321,7 +321,7 @@ def arbol_decision_puntos_jornada(ax):
     # Generar el gráfico de dispersión con puntos de predicción
     ax.scatter(X_test['SOFASCORE'], y_test, color='black', label='Real', alpha=0.3)
     ax.scatter(X_test['SOFASCORE'], y_pred, color='blue', label='Predicción', marker='x', alpha=0.5)
-    ax.plot(X_test['SOFASCORE'], y_pred, color='red', linewidth=2, label='Árbol de Decisión')
+    #ax.plot(X_test['SOFASCORE'], y_pred, color='red', linewidth=2, label='Árbol de Decisión')
     ax.set_xlabel('SOFASCORE')
     ax.set_ylabel('puntos_Jornada')
     ax.set_title('Gráfico de Dispersión con Árbol de Decisión de Predicción de Puntos Jornada')

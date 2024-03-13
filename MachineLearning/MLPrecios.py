@@ -36,6 +36,8 @@ def knn(ruta_fichero):
     # Entrena el modelo
     model.fit(X_train, y_train)
 
+    return model
+
 def arbol_decision(ruta_fichero):
         
     # Leer el archivo CSV

@@ -207,7 +207,7 @@ class BotonEjecutar(QPushButton):
             print("redes neuronales")
         elif(self.parent().findChild(QComboBox).currentText() == 'Árbol de decisión'):
             self.modelo = MLPuntuacion.arbol_decision(ruta_fichero=ruta_fichero)
-            seccion_resultado.decision_tree()
+            seccion_resultado.arbol_decision()
             print("arbol decision")
 class SeccionResultado(QWidget):
     def __init__(self):
@@ -239,7 +239,7 @@ class SeccionResultado(QWidget):
         PLTUtil.red_neuronal_puntos_jornada(self.ax)
         self.canvas.draw()
     
-    def random_forest(self):
+    def arbol_decision(self):
         PLTUtil.arbol_decision_puntos_jornada(self.ax)
         self.canvas.draw()
 

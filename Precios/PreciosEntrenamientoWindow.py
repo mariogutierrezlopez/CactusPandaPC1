@@ -165,11 +165,11 @@ class TablaEjemplaresCSV(QTableWidget):
         self.updateGeometry()
 
 class BotonEjecutar(QPushButton):
+    modelo = None
     def __init__(self):
         super().__init__()
         self.clicked.connect(self.ejecutar)
         self.setText("Ejecutar")
-        self.modelo = None
 
     def ejecutar(self):
         self.seccionResultado = self.parent().findChild(SeccionResultado)
